@@ -1,5 +1,5 @@
 <template>
-  <TarBar>
+  <TarBar class="TarBar">
     <TarBarItem path="/home" ActionColor="rgb(100,237,172)">
       <svg class="icon" aria-hidden="true" slot="icon-action">
         <use xlink:href="#icon-shouye" />
@@ -43,8 +43,8 @@
 </template>
 
 <script>
-import TarBar from "../../common/TabBar/tabBar";
-import TarBarItem from "../../common/TabBar/tabbar-items";
+import TarBar from "components/common/TabBar/tabBar";
+import TarBarItem from "components/common/TabBar/tabbar-items";
 
 export default {
   name: "MainTarBar",
@@ -56,4 +56,7 @@ export default {
 </script>
 
 <style scoped>
+.TarBar{
+  background-color: white;
+}
 </style>
