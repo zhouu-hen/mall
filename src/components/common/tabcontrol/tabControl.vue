@@ -27,6 +27,7 @@ export default {
   methods: {
     itemClick(index) {
       this.current = index;
+      this.$emit("tab-goods", index);
     },
   },
 };
