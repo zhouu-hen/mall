@@ -5,7 +5,14 @@
       <div slot="center">购物街</div>
     </navBarVue>
 
-    <scrollVue class="content" ref="scroll">
+    <scrollVue
+      class="content"
+      ref="scroll"
+      @PositionScroll="showTop"
+      :probeType="3"
+      :pullUpLoad="true"
+      @pullingUp="loadMore"
+    >
       <homeswiperVue :banners="banners" class="banner" />
       <homeRecommendVue :recommend="recommends" />
       <featureVue />
@@ -13,7 +20,7 @@
       <goodsListVue :goods="goods[currentType].list"></goodsListVue>
     </scrollVue>
 
-    <backTop @click.native="backtop"></backTop>
+    <backTop @click.native="backtop" v-show="isTopShow"></backTop>
   </div>
 </template>
 
@@ -44,6 +51,7 @@ export default {
       },
       goodsLable: ["pop", "new", "sell"],
       currentType: "pop",
+      isTopShow: false,
     };
   },
   components: {
@@ -80,14 +88,39 @@ export default {
       // 获取scrollvue中的scroll变量
       this.$refs.scroll.scroll.scrollTo(0, 0, 1000);
     },
+    showTop(position) {
+      this.isTopShow = position.y < -1000;
+    },
+    loadMore() {
+      this.getHomeGoods(this.currentType);
+      this.$refs.scroll.scroll.finishPullUp();
+    },
+    debounce(fun, delay) {
+      let timer = null;
+      return function (...args) {
+        if (timer) {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(() => {
+          fun.apply(this, args);
+        }, delay);
+      };
+    },
   },
-  computed: {},
   created() {
     // 标签页,和商品
     this.getHomeMultidata();
     this.getHomeGoods("pop");
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
+  },
+  mounted() {
+    // 读取事件总线
+    const refresh = this.debounce(this.$refs.scroll.refresh, 200);
+    this.$bus.$on("imgHeight", () => {
+      // 对Bscroll进行刷新
+      refresh()
+    });
   },
 };
 </script>

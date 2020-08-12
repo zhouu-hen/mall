@@ -14,18 +14,38 @@ export default {
   name: "Scroll",
   data() {
     return {
-      scroll:null,
-      message:'hhh'
+      scroll: null,
     };
   },
-  methods: {
-    
+  props: {
+    probeType: {
+      type: Number,
+      default: 0,
+    },
+    pullUpLoad: {
+      type: Boolean,
+      default: false,
+    },
   },
-  mounted(){
-    this.scroll = new BScroll(this.$refs.wrapper,{
-      click:true
-    })
-  }
+  methods: {
+    refresh() {
+      console.log('----');
+      this.scroll && this.scroll.refresh();
+    },
+  },
+  mounted() {
+    this.scroll = new BScroll(this.$refs.wrapper, {
+      click: true,
+      probeType: this.probeType,
+      pullUpLoad: this.pullUpLoad,
+    });
+    this.scroll.on("scroll", (position) => {
+      this.$emit("PositionScroll", position);
+    });
+    this.scroll.on("pullingUp", () => {
+      this.$emit("pullingUp");
+    });
+  },
 };
 </script>
 <style scoped>
