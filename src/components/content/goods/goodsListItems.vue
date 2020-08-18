@@ -1,7 +1,7 @@
 <!-- 商品内容组件 -->
 <template>
-  <div class="goodItem">
-    <img :src="goodsItem.show.img" :alt="goodsItem.title" @load="imgHeight" />
+  <div class="goodItem" @click="itemClick">
+    <img :src="showImg" :alt="goodsItem.title" @load="imgHeight" />
     <div>
       <p>{{goodsItem.title}}</p>
       <div class="num">
@@ -30,9 +30,17 @@ export default {
   methods: {
     imgHeight() {
       /* *  img的onload,图片加载后调用
-       *   给事件总线发射消息,用来修改高度
+       *   给事件总线发射消息,用来及时刷新Bscroll的高度
        */
       this.$bus.$emit("imgHeight");
+    },
+    itemClick() {
+      this.$router.push("/detail/" + this.goodsItem.iid);
+    },
+  },
+  computed: {
+    showImg() {
+      return this.goodsItem.image || this.goodsItem.show.img;
     },
   },
 };

@@ -28,6 +28,7 @@ export default {
     itemClick(index) {
       this.current = index;
       this.$emit("tab-goods", index);
+      
     },
   },
 };

@@ -4,19 +4,31 @@
     <navBarVue class="homeBar">
       <div slot="center">购物街</div>
     </navBarVue>
+    <tabControlVue
+      :titles="titles"
+      class="tabControl"
+      @tab-goods="goodsshow"
+      ref="tabControl2"
+      v-show="tabControlShow"
+    />
 
     <scrollVue
       class="content"
       ref="scroll"
-      @PositionScroll="showTop"
+      @PositionScroll="PositionScroll"
       :probeType="3"
       :pullUpLoad="true"
       @pullingUp="loadMore"
     >
-      <homeswiperVue :banners="banners" class="banner" />
+      <homeswiperVue :banners="banners" class="banner" @swiperImgLoad="swiperImgLoad" />
       <homeRecommendVue :recommend="recommends" />
       <featureVue />
-      <tabControlVue :titles="titles" class="tabControl" @tab-goods="goodsshow" />
+      <tabControlVue
+        :titles="titles"
+        @tab-goods="goodsshow"
+        ref="tabControl1"
+        v-show="!tabControlShow"
+      />
       <goodsListVue :goods="goods[currentType].list"></goodsListVue>
     </scrollVue>
 
@@ -31,11 +43,12 @@ import navBarVue from "components/common/navbar/navBar.vue";
 import tabControlVue from "components/common/tabcontrol/tabControl.vue";
 import goodsListVue from "components/content/goods/goodsList.vue";
 import scrollVue from "components/common/scroll/scroll.vue";
-import backTop from "../../components/content/backtop/backTop.vue";
 
 import homeswiperVue from "./children/homeswiper.vue";
 import homeRecommendVue from "./children/homeRecommend.vue";
 import featureVue from "./children/feature.vue";
+
+import { imgListenerMixin, backTopMix } from "commons/mixin.js";
 
 export default {
   name: "home",
@@ -51,9 +64,12 @@ export default {
       },
       goodsLable: ["pop", "new", "sell"],
       currentType: "pop",
-      isTopShow: false,
+      swiperTop: 0,
+      tabControlShow: false,
+      saveY: 0,
     };
   },
+  mixins: [imgListenerMixin, backTopMix],
   components: {
     navBarVue,
     homeswiperVue,
@@ -62,7 +78,6 @@ export default {
     tabControlVue,
     goodsListVue,
     scrollVue,
-    backTop,
   },
   methods: {
     // 获取轮播图数据和推荐的
@@ -78,33 +93,28 @@ export default {
       getHomeGoods(type, page).then((res) => {
         this.goods[type].list.push(...res.data.data.list);
         this.goods[type].page += 1;
+
+        this.$refs.scroll.scroll.finishPullUp();
       });
     },
     // 切换显示商品
     goodsshow(index) {
       this.currentType = this.goodsLable[index];
+      this.$refs.tabControl1.current = index;
+      this.$refs.tabControl2.current = index;
     },
-    backtop() {
-      // 获取scrollvue中的scroll变量
-      this.$refs.scroll.scroll.scrollTo(0, 0, 1000);
-    },
-    showTop(position) {
+    // 事件内相关的方法
+    
+    PositionScroll(position) {
       this.isTopShow = position.y < -1000;
+      this.tabControlShow = -position.y > this.swiperTop - 44;
     },
     loadMore() {
       this.getHomeGoods(this.currentType);
-      this.$refs.scroll.scroll.finishPullUp();
     },
-    debounce(fun, delay) {
-      let timer = null;
-      return function (...args) {
-        if (timer) {
-          clearTimeout(timer);
-        }
-        timer = setTimeout(() => {
-          fun.apply(this, args);
-        }, delay);
-      };
+    // 轮播图图片加载完成
+    swiperImgLoad() {
+      this.swiperTop = this.$refs.tabControl1.$el.offsetTop;
     },
   },
   created() {
@@ -114,13 +124,17 @@ export default {
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
   },
-  mounted() {
-    // 读取事件总线
-    const refresh = this.debounce(this.$refs.scroll.refresh, 200);
-    this.$bus.$on("imgHeight", () => {
-      // 对Bscroll进行刷新
-      refresh()
-    });
+  mounted() {},
+  activated() {
+    this.$refs.scroll.refresh();
+    this.$refs.scroll.scroll.scrollTo(0, this.saveY);
+  },
+  deactivated() {
+    // 保存滚动的位置
+    this.saveY = this.$refs.scroll.scroll.y;
+
+    // 取消对Bscroll的刷新
+    this.$bus.$off("imgHeight", this.imgListener);
   },
 };
 </script>
@@ -128,20 +142,14 @@ export default {
 <style scoped>
 #home {
   height: 100vh;
-  padding-top: 44px;
 }
 .homeBar {
   background-color: var(--color-tint);
   color: white;
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  z-index: 99;
 }
 .tabControl {
-  position: sticky;
-  top: 44px;
+  position: relative;
+  top: 0;
 }
 
 .content {

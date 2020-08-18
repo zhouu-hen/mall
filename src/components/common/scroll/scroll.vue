@@ -29,7 +29,6 @@ export default {
   },
   methods: {
     refresh() {
-      console.log('----');
       this.scroll && this.scroll.refresh();
     },
   },

@@ -21,6 +21,6 @@ export default {
   bottom: 50px;
 }
 .top img{
-  width: 36px;
+  width: 40px;
 }
 </style>
