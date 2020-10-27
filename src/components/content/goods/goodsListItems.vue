@@ -1,7 +1,7 @@
 <!-- 商品内容组件 -->
 <template>
   <div class="goodItem" @click="itemClick">
-    <img :src="showImg" :alt="goodsItem.title" @load="imgHeight" />
+    <img v-lazy="showImg" :alt="goodsItem.title" @load="imgHeight" />
     <div>
       <p>{{goodsItem.title}}</p>
       <div class="num">

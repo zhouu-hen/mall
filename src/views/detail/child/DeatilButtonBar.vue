@@ -20,7 +20,7 @@
       <span>客服</span>
     </div>
     <div>
-      <div class="car">加入购物车</div>
+      <div class="car" @click="buycar">加入购物车</div>
       <div class="buy">立即购买</div>
     </div>
   </div>
@@ -28,11 +28,15 @@
 
 <script>
 export default {
-  name: "",
+  name: "deatilbuttonbar",
   data() {
     return {};
   },
-  methods: {},
+  methods: {
+    buycar() {
+      this.$emit("buycar")
+    },
+  },
 };
 </script>
 <style scoped>
@@ -57,7 +61,7 @@ export default {
   font-size: 12px;
   flex: 1;
 }
-.button div{
+.button div {
   display: flex;
   justify-content: center;
 }

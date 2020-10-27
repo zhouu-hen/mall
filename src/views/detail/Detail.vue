@@ -12,8 +12,9 @@
       <p class="tuijian">推荐展示</p>
       <goodsList :goods="recommend" ref="recommends" />
     </Scroll>
-    <DeatilButtonBar />
+    <DeatilButtonBar @buycar="addCar" />
     <backTop @click.native="backtop" v-show="isTopShow"></backTop>
+    <Toast />
   </div>
 </template>
 
@@ -38,6 +39,7 @@ import DeatilComment from "./child/DeatilComment.vue";
 import goodsList from "../../components/content/goods/goodsList.vue";
 import DeatilButtonBar from "./child/DeatilButtonBar";
 import Scroll from "components/common/scroll/scroll";
+import Toast from "components/common/toast/Toast.vue";
 
 export default {
   name: "detail",
@@ -66,6 +68,7 @@ export default {
     Scroll,
     goodsList,
     DeatilButtonBar,
+    Toast,
   },
   mixins: [imgListenerMixin, backTopMix],
   methods: {
@@ -95,7 +98,29 @@ export default {
       }
       this.isTopShow = position.y < -1000;
     },
+
+    addCar() {
+      const product = {};
+      product.image = this.topImages[0];
+      product.title = this.goods.title;
+      product.desc = this.goods.desc;
+      product.price = this.goods.realPrice;
+      product.iid = this.iid;
+      product.count = 1;
+
+      this.$store.dispatch("addCar", product).then((res) => {
+        // this.isShow = true;
+        // this.message = res;
+        // setTimeout(() => {
+        //   this.isShow = false;
+        // }, 1500);
+
+        this.$toast.show(res)
+      });
+
+    },
   },
+
   mounted() {},
   created() {
     // 保存传入的iid
@@ -113,7 +138,6 @@ export default {
         data.columns,
         data.shopInfo.services
       );
-
       //得到店铺的信息
       this.shop = new Shop(data.shopInfo);
 

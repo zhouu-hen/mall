@@ -4,7 +4,7 @@ import {
 import backTop from "components/content/backtop/backTop.vue";
 
 
-// 混入的使用导出一个变量,在使用mixins:[]来接受
+// 混入的使用导出一个变量,在使用mixins:[]来接收
 
 
 export const imgListenerMixin = {
@@ -25,18 +25,18 @@ export const imgListenerMixin = {
 }
 
 export const backTopMix = {
-  data(){
-    return{
+  data() {
+    return {
       isTopShow: false,
     }
   },
-  methods:{
+  methods: {
     backtop() {
       // 获取scrollvue中的scroll变量
       this.$refs.scroll.scroll.scrollTo(0, 0, 1000);
     },
   },
-  components:{
+  components: {
     backTop,
   }
 }
